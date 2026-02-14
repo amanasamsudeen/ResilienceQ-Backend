@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
-from datetime import date
+from datetime import date, datetime
 from typing import List
 
 class PersonalInfo(BaseModel):
@@ -17,3 +17,13 @@ class PersonalInfo(BaseModel):
 class AssessmentSubmission(BaseModel):
     personalInfo: PersonalInfo
     answers: List[int]
+
+class QuizHistoryResponse(BaseModel):
+    id: int
+    score: int
+    level: str
+    duration: str
+    created_at: datetime
+
+    class Config:
+        orm_mode = True

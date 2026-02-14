@@ -19,3 +19,8 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class UserUpdate(BaseModel):
+    name: str
+    email: EmailStr
+    institution: str
