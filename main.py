@@ -13,6 +13,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:4321",  
+     "https://resilience-q.vercel.app",
 ]
 
 app.add_middleware(
