@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, TIMESTAMP
+from sqlalchemy import Column, String, TIMESTAMP,Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from database import Base
@@ -14,5 +14,5 @@ class User(Base):
     role = Column(String(20), default="student")
     institution = Column(String(150))
     created_at = Column(TIMESTAMP, server_default=func.now())
-    
+    is_verified = Column(Boolean, default=False)
     quizzes = relationship("QuizHistory", back_populates="user")

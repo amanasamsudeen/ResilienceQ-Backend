@@ -24,3 +24,10 @@ class UserUpdate(BaseModel):
     name: str
     email: EmailStr
     institution: str
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    password: str
