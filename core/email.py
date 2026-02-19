@@ -16,7 +16,8 @@ conf = ConnectionConfig(
     MAIL_SERVER= os.getenv("MAIL_SERVER"),
     MAIL_STARTTLS= os.getenv("MAIL_STARTTLS") == "True",
     MAIL_SSL_TLS= os.getenv("MAIL_SSL_TLS") == "True",
-    USE_CREDENTIALS=True
+    USE_CREDENTIALS=os.getenv("USE_CREDENTIALS") == "True",
+    VALIDATE_CERTS=True
 )
 
 BASE_DIR = Path(__file__).resolve().parent.parent
