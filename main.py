@@ -1,5 +1,5 @@
 from fastapi import Depends, FastAPI, HTTPException
-from routers import auth,chat,personal_info,assessment,ai_recommendation
+from routers import auth,chat,personal_info,assessment,ai_recommendation,admin
 
 from sqlalchemy.orm import Session
 from database import SessionLocal, Base, engine
@@ -29,6 +29,7 @@ app.include_router(chat.router)
 app.include_router(personal_info.router)
 app.include_router(assessment.router)
 app.include_router(ai_recommendation.router)
+app.include_router(admin.router)
 
 def get_db():
     db = SessionLocal()

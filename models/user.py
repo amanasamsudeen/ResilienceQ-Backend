@@ -15,4 +15,5 @@ class User(Base):
     institution = Column(String(150))
     created_at = Column(TIMESTAMP, server_default=func.now())
     is_verified = Column(Boolean, default=False)
+    is_active = Column(Boolean, default=True)
     quizzes = relationship("QuizHistory", back_populates="user")

@@ -39,8 +39,8 @@ def submit_assessment(
     new_quiz = QuizHistory(
         user_id=current_user.user_id,
         score=score,
-        level=level,
-        duration="8 mins"
+        level=level
+       
     )
 
     db.add(new_quiz)
@@ -57,20 +57,20 @@ def submit_assessment(
     }
 
 
-@router.get("/download")
-def download_latest_excel():
-    files = list(EXPORT_DIR.glob("resilienceq_*.xlsx"))
+@router.get("/download/{filename}")
+def download_excel(filename: str):
 
-    if not files:
-        raise HTTPException(status_code=404, detail="No assessment file found")
+    file_path = EXPORT_DIR / filename
 
-    latest_file = max(files, key=lambda f: f.stat().st_mtime)
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
 
     return FileResponse(
-        path=latest_file,
-        filename=latest_file.name,
+        path=file_path,
+        filename=file_path.name,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
+
 
 
 @router.get("/history", response_model=List[QuizHistoryResponse])

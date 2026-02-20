@@ -22,7 +22,7 @@ class QuizHistoryResponse(BaseModel):
     id: int
     score: int
     level: str
-    duration: str
+
     created_at: datetime
 
     class Config:

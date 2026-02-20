@@ -81,10 +81,9 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
     if not db_user:
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
-   
     if not verify_password(user.password, db_user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password")
-    
+
     if not db_user.is_verified:
         raise HTTPException(
             status_code=403,
@@ -92,12 +91,16 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
         )
 
     access_token = create_access_token(
-        data={"sub": str(db_user.user_id), "role": db_user.role}
+        data={
+            "sub": str(db_user.user_id),
+            "role": db_user.role  # ✅ embed role in token
+        }
     )
 
     return {
         "access_token": access_token,
         "token_type": "bearer",
+        "role": db_user.role,  # ✅ FIXED
         "message": "Login successful"
     }
 
