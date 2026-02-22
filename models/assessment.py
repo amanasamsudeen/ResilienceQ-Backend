@@ -11,7 +11,8 @@ class QuizHistory(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.user_id"))
     score = Column(Integer)
     level = Column(String)
-    duration = Column(String)
+    
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="quizzes")
+
