@@ -52,7 +52,8 @@ async def register_user(user: UserRegister, db: Session = Depends(get_db)):
         email=user.email,
         password_hash=hash_password(user.password),
         institution=user.institution,
-        is_verified=False
+        is_verified=False,
+        is_active = False
     )
 
     db.add(new_user)
