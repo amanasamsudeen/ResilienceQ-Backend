@@ -18,3 +18,22 @@ class AIRecommendationResponse(BaseModel):
     resilience_state: str
     recommendations: List[RecommendationItem]
     encouragement: str
+class ChatHistoryItem(BaseModel):
+    role: str
+    message: str
+class AIChatRequest(BaseModel):
+    message: str
+    resilience_level: str
+    score: int
+    history: List[ChatHistoryItem] = []
+    recommendations: List[RecommendationItem]
+
+class TrendItem(BaseModel):
+    date: str
+    score: int
+    level: str
+
+
+class TrendRequest(BaseModel):
+    username: str
+    history: List[TrendItem]

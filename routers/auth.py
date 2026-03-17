@@ -61,14 +61,14 @@ async def register_user(user: UserRegister, db: Session = Depends(get_db)):
     db.refresh(new_user)
 
     # 🎟 Generate email verification token
-    token = create_email_token(new_user.email)
+    # token = create_email_token(new_user.email)
 
     # 📧 Send verification email
-    await send_verification_email(
-    email=user.email,
-    username=user.full_name,
-    token=token
-)
+#     await send_verification_email(
+#     email=user.email,
+#     username=user.full_name,
+#     token=token
+# )
 
     return {
         "message": "User registered successfully. Please verify your email to activate your account."

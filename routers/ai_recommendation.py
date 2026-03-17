@@ -5,7 +5,9 @@ from database import get_db
 from models.assessment import QuizHistory
 from models.chat_schema import ChatRequest
 from models.user import User
-from schemas.ai_recommendation import AIRecommendationRequest, AIRecommendationResponse, LatestRecommendationRequest
+from schemas.ai_recommendation import AIChatRequest, AIRecommendationRequest, AIRecommendationResponse, LatestRecommendationRequest, TrendRequest
+from services.coach_agent import generate_coach_prompt
+from services.trend_analyzer import analyze_trend
 from utils.gemini_client import model
 from utils.prompt import build_recommendation_prompt
 from fastapi.responses import FileResponse
@@ -118,3 +120,117 @@ def latest_recommendation(current_user: User = Depends(get_current_user),db: Ses
             total_score=latest_quiz.score
         )
     )
+    
+@router.post("/coach-chat")
+def coach_chat(payload: AIChatRequest):
+
+    # Limit history to last 6 messages
+    recent_history = payload.history[-6:]
+
+    history_text = ""
+    for msg in recent_history:
+        role = "User" if msg.role == "user" else "Coach"
+        history_text += f"{role}: {msg.message}\n"
+
+    # Format recommendations
+    rec_text = ""
+    for r in payload.recommendations:
+        rec_text += f"- {r.title}: {r.description}\n"
+
+    prompt = f"""
+You are a professional AI resilience coach helping adolescents.
+
+User resilience profile:
+Resilience Level: {payload.resilience_level}
+Resilience Score: {payload.score}
+
+Personalized recommendations from assessment:
+{rec_text}
+
+Previous conversation:
+{history_text}
+
+User question:
+{payload.message}
+
+Instructions:
+- Be supportive and empathetic
+- Provide practical resilience advice
+- Reference the user's recommendations if relevant
+- Keep response under 120 words
+- Encourage positive coping strategies
+
+Coach response:
+"""
+
+    try:
+        response = model.generate_content(prompt)
+
+        return {
+            "reply": response.text
+        }
+
+    except Exception as e:
+        return {
+            "reply": "I'm here to support you, but something went wrong. Please try again."
+        }
+        
+
+@router.post("/resilience-insight")
+def generate_resilience_insight(request: TrendRequest):
+
+    data = request.history
+
+    scores = [item.score for item in data]
+
+    latest = scores[-1]
+    previous = scores[-2] if len(scores) > 1 else None
+
+    trend = "stable"
+
+    if previous:
+        if latest > previous:
+            trend = "improving"
+        elif latest < previous:
+            trend = "declining"
+
+    prompt = f"""
+    You are an AI resilience coach.
+
+    User resilience history:
+    {data}
+
+    Current score: {latest}
+    Trend: {trend}
+
+    Tasks:
+    1. Provide insight about the resilience trend.
+    2. Encourage the user positively.
+    3. Suggest 3 daily resilience-building activities.
+    4. Provide short coaching advice.
+
+    Response format:
+    - Trend Insight
+    - Coaching Advice
+    - Daily Activities
+    """
+
+    response = model.generate_content(prompt)
+
+    return {"insight": response.text}
+
+@router.post("/resilience-coach")
+def resilience_coach(data: TrendRequest):
+
+    trend = analyze_trend(data.history)
+ 
+    prompt = generate_coach_prompt(username=data.username,
+        history=data.history,
+        trend=trend)
+
+    response = model.generate_content(prompt)
+
+    return {
+        "trend": trend,
+        "insight": response.text
+    }
