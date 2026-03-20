@@ -122,57 +122,64 @@ def latest_recommendation(current_user: User = Depends(get_current_user),db: Ses
     )
     
 @router.post("/coach-chat")
-def coach_chat(payload: AIChatRequest):
+async def coach_chat(payload: AIChatRequest):
+    # 1. Handle History (Limit to last 6 for token efficiency)
+    # Ensure we handle cases where history might be empty
+    recent_history = payload.history[-6:] if payload.history else []
+    
+    history_conversation = "\n".join([
+        f"{'User' if msg.role == 'user' else 'Coach'}: {msg.message}" 
+        for msg in recent_history
+    ])
 
-    # Limit history to last 6 messages
-    recent_history = payload.history[-6:]
+    # 2. Format Recommendations safely
+    recommendations_list = "\n".join([
+        f"- {r.title}: {r.description}" for r in payload.recommendations
+    ]) if payload.recommendations else "No specific recommendations yet."
 
-    history_text = ""
-    for msg in recent_history:
-        role = "User" if msg.role == "user" else "Coach"
-        history_text += f"{role}: {msg.message}\n"
+    # 3. Structured Prompting
+    # We use a clear delimiter approach to help the LLM distinguish context from the query
+    system_context = f"""
+    ROLE: Professional AI Resilience Coach for adolescents.
+    USER PROFILE: Level: {payload.resilience_level}, 
+    SPECIFIC GUIDANCE: {recommendations_list}
+    """
 
-    # Format recommendations
-    rec_text = ""
-    for r in payload.recommendations:
-        rec_text += f"- {r.title}: {r.description}\n"
+    full_prompt = f"""
+    {system_context}
 
-    prompt = f"""
-You are a professional AI resilience coach helping adolescents.
+    CONVERSATION HISTORY:
+    {history_conversation}
 
-User resilience profile:
-Resilience Level: {payload.resilience_level}
-Resilience Score: {payload.score}
+    CURRENT USER INPUT:
+    {payload.message}
 
-Personalized recommendations from assessment:
-{rec_text}
+    INSTRUCTIONS:
+    - Be empathetic, supportive, and non-judgmental.
+    - Use "we" and "us" to build rapport.
+    - Reference their specific recommendations when it fits naturally.
+    - Constraint: Keep response under 120 words.
+    - Goal: Provide one actionable resilience-building step.
 
-Previous conversation:
-{history_text}
-
-User question:
-{payload.message}
-
-Instructions:
-- Be supportive and empathetic
-- Provide practical resilience advice
-- Reference the user's recommendations if relevant
-- Keep response under 120 words
-- Encourage positive coping strategies
-
-Coach response:
-"""
+    COACH RESPONSE:
+    """
 
     try:
-        response = model.generate_content(prompt)
+        # Use async if your SDK supports it, or keep it standard
+        response = model.generate_content(full_prompt)
+        
+        if not response.text:
+            raise ValueError("Empty response from AI model")
 
         return {
-            "reply": response.text
+            "reply": response.text.strip()
         }
 
     except Exception as e:
+        print(f"AI Coach Error: {str(e)}") # Log the actual error for debugging
+        # Return a friendly fallback message
         return {
-            "reply": "I'm here to support you, but something went wrong. Please try again."
+            "reply": "I'm here for you, but I'm having a little trouble connecting right now. Could you try saying that again?"
         }
         
 

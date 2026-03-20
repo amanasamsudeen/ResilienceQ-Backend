@@ -24,7 +24,7 @@ class ChatHistoryItem(BaseModel):
 class AIChatRequest(BaseModel):
     message: str
     resilience_level: str
-    score: int
+   
     history: List[ChatHistoryItem] = []
     recommendations: List[RecommendationItem]
 
