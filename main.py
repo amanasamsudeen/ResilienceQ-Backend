@@ -14,6 +14,7 @@ app = FastAPI()
 origins = [
     "http://localhost:4321",  
      "https://resilienceq.in",
+     "https://www.resilienceq.in"
 ]
 
 app.add_middleware(
