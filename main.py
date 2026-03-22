@@ -14,11 +14,14 @@ app = FastAPI()
 origins = [
     "http://localhost:4321",  
      "https://resilienceq.in",
-     "https://www.resilienceq.in"
+     "https://www.resilienceq.in",
+      "http://resilienceq.in",          # 🔥 add this
+    "http://www.resilienceq.in", 
 ]
 
 app.add_middleware(
     CORSMiddleware,
+     allow_origin_regex="https://.*resilienceq\\.in",
     allow_origins=origins,       
     allow_credentials=True,
     allow_methods=["*"],
