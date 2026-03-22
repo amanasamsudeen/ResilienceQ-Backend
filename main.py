@@ -28,6 +28,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.options("/{full_path:path}")
+async def options_handler():
+    return {"message": "OK"}
+
 app.include_router(auth.router)
 app.include_router(chat.router)
 app.include_router(personal_info.router)
