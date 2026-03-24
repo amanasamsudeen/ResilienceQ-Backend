@@ -104,11 +104,11 @@ def ingest_pdfs():
             
         except Exception as e:
             if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
-                print(" Quota hit! Sleeping for 30 seconds to reset...")
+                print("🛑 Quota hit! Sleeping for 30 seconds to reset...")
                 time.sleep(30) # Longer sleep to let the 1-minute quota window clear
                 # We do NOT increment 'i' here, so it will retry the SAME batch
             else:
-                print(f" Unexpected Error: {e}")
+                print(f"❌ Unexpected Error: {e}")
                 break # Stop if it's a real error (like an invalid API key)
 
     print("🏁 Finished! Check your Pinecone dashboard for the final count.")

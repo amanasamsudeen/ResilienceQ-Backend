@@ -18,7 +18,6 @@ import os
 from utils.token import ALGORITHM, create_email_token, create_reset_token, verify_email_token;
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
-FRONTEND_URL = os.getenv("FRONTEND_URL")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -180,7 +179,7 @@ def forgot_password(data: ForgotPasswordRequest, db: Session = Depends(get_db)):
 
     token = create_reset_token(user.email)
 
-    reset_link = f"{FRONTEND_URL}/reset-password?token={token}"
+    reset_link = f"http://localhost:4321/reset-password?token={token}"
 
     send_reset_email(user.email, reset_link)
 
