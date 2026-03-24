@@ -16,8 +16,8 @@ CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 
 # 1. SET ENVIRONMENT VARIABLES (This fixes the API Key error)
-PINECONE_API_KEY = "pcsk_3L3cYv_7mwC2hcrRxVbuDeVXVUDfnSTyrKDyDRj2ru2vts9zBg2wY8FLz6H1oj9QqPzukR" # Your actual key
-GOOGLE_API_KEY = "AIzaSyCidyWIVfn6wUZInxVuYV4cMOyj-HZ2w44"    # Your actual key
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")# Your actual key
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")    # Your actual key
 
 os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
 os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
@@ -105,8 +105,7 @@ def ingest_pdfs():
         except Exception as e:
             if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
                 print(" Quota hit! Sleeping for 30 seconds to reset...")
-                time.sleep(30) # Longer sleep to let the 1-minute quota window clear
-                # We do NOT increment 'i' here, so it will retry the SAME batch
+                time.sleep(30) 
             else:
                 print(f" Unexpected Error: {e}")
                 break # Stop if it's a real error (like an invalid API key)
