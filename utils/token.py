@@ -16,6 +16,6 @@ def verify_email_token(token: str):
     return payload.get("sub")
 
 def create_reset_token(email: str):
-    expire = datetime.utcnow() + timedelta(minutes=15)
+    expire = datetime.utcnow() + timedelta(minutes=180)
     payload = {"sub": email, "exp": expire}
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)

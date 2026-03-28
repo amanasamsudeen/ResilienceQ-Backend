@@ -27,7 +27,18 @@ def submit_assessment(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    score = sum(payload.answers)
+    negative_questions = [5, 6, 9, 10, 12, 15, 16, 23, 25, 27]
+
+    score = 0
+
+    for index, val in enumerate(payload.answers):
+        if val is None:
+            continue
+
+        if index in negative_questions:
+            score += (6 - val)
+        else:
+            score += val
 
     if score < 60:
         level = "Low"
@@ -40,7 +51,6 @@ def submit_assessment(
         user_id=current_user.user_id,
         score=score,
         level=level
-       
     )
 
     db.add(new_quiz)

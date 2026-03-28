@@ -95,14 +95,14 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
     access_token = create_access_token(
         data={
             "sub": str(db_user.user_id),
-            "role": db_user.role  # ✅ embed role in token
+            "role": db_user.role 
         }
     )
 
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "role": db_user.role,  # ✅ FIXED
+        "role": db_user.role,  
         "message": "Login successful"
     }
 
